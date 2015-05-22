@@ -6,7 +6,7 @@
 # REST URL
 | URL        | METHOD | Output        | Description  |
 | -----------|:------:|:-------------:| -----:|
-| /wm/controller/topology            | GET/POST     | dot|json | Output a graph in dot|json format of the network. If no parameter is passed to the POST request, *json* is used |
+| /wm/controller/topology            | GET/POST     | dot/json | Output a graph in dot|json format of the network. If no parameter is passed to the POST request, *json* is used |
 | /wm/controller/topology/create     | GET          | bool  | Force the update/rebuild of the network graph |
 | /wm/controller/topology/timeout    | POST         | void  | Change the timeout of rebuild the network topology. Pass the ms w/ the POST request |
 
