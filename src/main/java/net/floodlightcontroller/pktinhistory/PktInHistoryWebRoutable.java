@@ -10,7 +10,9 @@ public class PktInHistoryWebRoutable implements RestletRoutable {
     @Override
     public Restlet getRestlet(Context context) {
         Router router = new Router(context);
-        router.attach("/topology/json", PktInHistoryResource.class);
+        router.attach("/topology", TopologyGraphResource.class);
+        router.attach("/topology/create", TopologyForceCreationResource.class);
+        router.attach("/topology/timeout", TopologySetTimeoutResource.class);
         return router;
     }
  
