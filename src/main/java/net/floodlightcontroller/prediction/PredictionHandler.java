@@ -25,6 +25,7 @@ public class PredictionHandler {
 		private AbstractClassifier classifier;
 		private boolean isLearning = false;
 		private String modelPath = "";
+		private static final String defaultUri = "prediction/default.model";
 
 		public PredictionNode(){};
 
@@ -84,16 +85,17 @@ public class PredictionHandler {
 				//Model Exists -> Create a new Classifier
 				try {
 					classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(uri));
-					//classifier = new MultilayerPerceptron();
 				} catch (Exception e) {
-					//TODO -> Do something :p
+					System.err.println("Error in loading the model " + uri);
 				}
 			}
 			else {
 				//Load a default model
 				try {
-					//classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream("default.model"));
-				} catch (Exception e) {}
+					classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(defaultUri));
+				} catch (Exception e) {
+					System.err.println("Error in loading the default model");
+				}
 			}
 		}
 		public void loadClassifierFromFile(){
