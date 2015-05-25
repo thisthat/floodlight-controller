@@ -45,6 +45,24 @@ public class PredictionHandler {
 		}
 
 		/**
+		 * Getter
+		 * @return class name of classifier
+		 */
+		public String getClassifierName(){
+			if(classifier == null){
+				return "No Classifier Yet!";
+			}
+			return classifier.getClass().getName();
+		}
+		/**
+		 * Getter
+		 * @return the state of learning
+		 */
+		public boolean getLearning(){
+			return isLearning;
+		}
+
+		/**
 		 * Load a classifier from file
 		 * @param uri: file path of the model
 		 */
