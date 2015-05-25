@@ -1,56 +1,95 @@
 package net.floodlightcontroller.prediction;
 
+import net.floodlightcontroller.prediction.PredictionModule.SwitchNode;
+import weka.classifiers.AbstractClassifier;
+import weka.classifiers.functions.MultilayerPerceptron;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.floodlightcontroller.prediction.PredictionModule.SwitchNode;
-import weka.classifiers.functions.MultilayerPerceptron;
-import weka.core.SerializationHelper;
-
+/**
+ * Handle the Prediction feature for all the switches
+ */
 public class PredictionHandler {
 	private String _folder = "prediction/";
-	protected Map<String, MultilayerPerceptron> prediction = new HashMap<String, MultilayerPerceptron>();
-	
+	protected Map<String, PredictionNode> prediction = new HashMap<String, PredictionNode>();
+
+	/**
+	 * Handle the Prediction Strucutre for a node
+	 */
+	public class PredictionNode {
+		private AbstractClassifier classifier;
+		private boolean isLearning = false;
+
+		public PredictionNode(){};
+
+		/**
+		 * Create the classifier from file and setting the learning as False
+		 * @param uri: file path of the model
+		 */
+		public PredictionNode(String uri){
+			loadClassifierFromFile(uri);
+		}
+
+		/**
+		 * Create the classifier from file
+		 * @param uri: file path of the model
+		 * @param learning: boolean flag to toggle the continous learning
+		 */
+		public PredictionNode(String uri, boolean learning){
+			loadClassifierFromFile(uri);
+			isLearning = learning;
+		}
+
+		/**
+		 * Load a classifier from file
+		 * @param uri: file path of the model
+		 */
+		public void loadClassifierFromFile(String uri){
+			File f = new File(uri);
+			if(f.exists() && !f.isDirectory()) {
+				//Model Exists -> Create a new Classifier
+				try {
+					//classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(uri));
+					classifier = new MultilayerPerceptron();
+				} catch (Exception e) {
+					//TODO -> Do something :p
+				}
+			}
+			else {
+				//Load a default model
+				try {
+					//classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream("default.model"));
+				} catch (Exception e) {}
+			}
+		}
+	}
+
+
 	public PredictionHandler(){};
-	
+
+	/**
+	 * Set the current switches in the network
+	 * @param switches: List of  the current switches in the network
+	 */
 	public void setSwitch(List<SwitchNode> switches){
-		
 		//Search for new elements 
 		for(SwitchNode s : switches){
 			String name = s.getName();
 			if(!prediction.containsKey(name)){
-				//Search for existing model for that switch
 				//Standard is {dpid}.model
 				String fileModel = _folder + name + ".model";
-				File f = new File(fileModel);
-				MultilayerPerceptron p = null;
-				if(f.exists() && !f.isDirectory()) { 
-					//Model Exists -> Create a new Classifier
-					try {
-						//p = (MultilayerPerceptron) SerializationHelper.read(new FileInputStream(fileModel));
-						p = new MultilayerPerceptron();
-					} catch (Exception e) {
-						//TODO -> Do something :p
-					}
-				}
-				else {
-					//Load a default model
-					try {
-						//p = (MultilayerPerceptron) SerializationHelper.read(new FileInputStream("default.model"));
-					} catch (Exception e) {}
-				}
+				PredictionNode p = new PredictionNode(fileModel);
 				prediction.put(name, p);
 			}
 		}
-		//Delete not more existing elements
+		//Delete the not more existing elements
 		boolean exists;
-		for(Iterator<Map.Entry<String,MultilayerPerceptron>> it = prediction.entrySet().iterator(); it.hasNext();){
-			Map.Entry<String, MultilayerPerceptron> entry = it.next();
+		for(Iterator<Map.Entry<String,PredictionNode>> it = prediction.entrySet().iterator(); it.hasNext();){
+			Map.Entry<String, PredictionNode> entry = it.next();
 			exists = false;
 			for(SwitchNode s : switches){
 				String name = s.getName();
@@ -67,4 +106,23 @@ public class PredictionHandler {
 		System.out.println("======");
 	}
 
+	/**
+	 * Get the prediction info from a switch
+	 * @param dpid: Switch DPID
+	 * @return Classifier information for that switch
+	 */
+	public PredictionNode getSwitch(String dpid){
+		if(prediction.containsKey(dpid)){
+			return prediction.get(dpid);
+		}
+		return null;
+	}
+
+	/**
+	 * Get all the prediction info
+	 * @return Classifiers of all switches
+	 */
+	public Map<String, PredictionNode> getSwitches(){
+		return prediction;
+	}
 }

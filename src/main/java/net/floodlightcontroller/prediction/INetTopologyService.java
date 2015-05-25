@@ -8,4 +8,5 @@ public interface INetTopologyService extends IFloodlightService {
     public String getTopologyGraph(String format);
     public void createTopology();
     public void setTimeout(int time);
+    public PredictionHandler getPredictionStructure();
 }

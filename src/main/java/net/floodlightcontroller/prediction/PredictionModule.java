@@ -1,11 +1,5 @@
 package net.floodlightcontroller.prediction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
@@ -19,10 +13,11 @@ import net.floodlightcontroller.linkdiscovery.LinkInfo;
 import net.floodlightcontroller.restserver.IRestApiService;
 import net.floodlightcontroller.routing.Link;
 import net.floodlightcontroller.topology.ITopologyService;
-
 import org.projectfloodlight.openflow.protocol.OFMessage;
 import org.projectfloodlight.openflow.protocol.OFType;
 import org.projectfloodlight.openflow.types.DatapathId;
+
+import java.util.*;
 
 // AllSwitchStatisticsResource
 public class PredictionModule implements IFloodlightModule, INetTopologyService, IOFMessageListener {
@@ -345,5 +340,9 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	//Change the timeout for rebuild the topology
 	public void setTimeout(int time){
 		this.SleepTimeout = time;
+	}
+
+	public PredictionHandler getPredictionStructure(){
+		return predictionProvider;
 	}
 }

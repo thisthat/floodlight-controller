@@ -1,18 +1,21 @@
 package net.floodlightcontroller.prediction;
- 
+
+import net.floodlightcontroller.restserver.RestletRoutable;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
  
-import net.floodlightcontroller.restserver.RestletRoutable;
- 
 public class BindUrlWebRoutable implements RestletRoutable {
+
+    public static final String PRED_STATS = "pred_stats";
+
     @Override
     public Restlet getRestlet(Context context) {
         Router router = new Router(context);
         router.attach("/topology", TopologyGraphResource.class);
         router.attach("/topology/create", TopologyForceCreationResource.class);
         router.attach("/topology/timeout", TopologySetTimeoutResource.class);
+        router.attach("/prediction/{" + PRED_STATS + "}/json", ClassifierInfoResource.class);
         return router;
     }
  
