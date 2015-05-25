@@ -8,6 +8,7 @@ import org.restlet.routing.Router;
 public class BindUrlWebRoutable implements RestletRoutable {
 
     public static final String PRED_STATS = "pred_stats";
+    public static final String DPID = "dpid";
 
     @Override
     public Restlet getRestlet(Context context) {
@@ -16,6 +17,7 @@ public class BindUrlWebRoutable implements RestletRoutable {
         router.attach("/topology/create", TopologyForceCreationResource.class);
         router.attach("/topology/timeout", TopologySetTimeoutResource.class);
         router.attach("/prediction/{" + PRED_STATS + "}/json", ClassifierInfoResource.class);
+        router.attach("/prediction/{" + DPID + "}/reload", ClassifierReloadResource.class);
         return router;
     }
  

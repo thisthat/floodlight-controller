@@ -2,9 +2,10 @@ package net.floodlightcontroller.prediction;
 
 import net.floodlightcontroller.prediction.PredictionModule.SwitchNode;
 import weka.classifiers.AbstractClassifier;
-import weka.classifiers.functions.MultilayerPerceptron;
+import weka.core.SerializationHelper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ public class PredictionHandler {
 	public class PredictionNode {
 		private AbstractClassifier classifier;
 		private boolean isLearning = false;
+		private String modelPath = "";
 
 		public PredictionNode(){};
 
@@ -31,6 +33,7 @@ public class PredictionHandler {
 		 * @param uri: file path of the model
 		 */
 		public PredictionNode(String uri){
+			modelPath = uri;
 			loadClassifierFromFile(uri);
 		}
 
@@ -40,6 +43,7 @@ public class PredictionHandler {
 		 * @param learning: boolean flag to toggle the continous learning
 		 */
 		public PredictionNode(String uri, boolean learning){
+			modelPath = uri;
 			loadClassifierFromFile(uri);
 			isLearning = learning;
 		}
@@ -63,6 +67,14 @@ public class PredictionHandler {
 		}
 
 		/**
+		 * Getter
+		 * @return the path of the model
+		 */
+		public String getModelPath() {
+			return modelPath;
+		}
+
+		/**
 		 * Load a classifier from file
 		 * @param uri: file path of the model
 		 */
@@ -71,8 +83,8 @@ public class PredictionHandler {
 			if(f.exists() && !f.isDirectory()) {
 				//Model Exists -> Create a new Classifier
 				try {
-					//classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(uri));
-					classifier = new MultilayerPerceptron();
+					classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(uri));
+					//classifier = new MultilayerPerceptron();
 				} catch (Exception e) {
 					//TODO -> Do something :p
 				}
@@ -83,6 +95,9 @@ public class PredictionHandler {
 					//classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream("default.model"));
 				} catch (Exception e) {}
 			}
+		}
+		public void loadClassifierFromFile(){
+			loadClassifierFromFile(this.modelPath);
 		}
 	}
 
