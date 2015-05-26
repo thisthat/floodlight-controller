@@ -26,6 +26,7 @@ public class PredictionHandler {
 		private boolean isLearning = false;
 		private String modelPath = "";
 		private static final String defaultUri = "prediction/default.model";
+		private java.util.Date lastLoad = new java.util.Date(0);
 
 		public PredictionNode(){};
 
@@ -76,6 +77,15 @@ public class PredictionHandler {
 		}
 
 		/**
+		 * Getter
+		 * @return the timestamp on when the model is loaded
+		 */
+		public String getLoadedTimeStr(){
+			String t = lastLoad.getTime() + "";
+			return t.substring(0, t.length()-3);
+		}
+
+		/**
 		 * Load a classifier from file
 		 * @param uri: file path of the model
 		 */
@@ -85,6 +95,7 @@ public class PredictionHandler {
 				//Model Exists -> Create a new Classifier
 				try {
 					classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(uri));
+					lastLoad = new java.util.Date();
 				} catch (Exception e) {
 					System.err.println("Error in loading the model " + uri);
 				}
@@ -93,6 +104,7 @@ public class PredictionHandler {
 				//Load a default model
 				try {
 					classifier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(defaultUri));
+					lastLoad = new java.util.Date();
 				} catch (Exception e) {
 					System.err.println("Error in loading the default model");
 				}
@@ -101,6 +113,8 @@ public class PredictionHandler {
 		public void loadClassifierFromFile(){
 			loadClassifierFromFile(this.modelPath);
 		}
+
+
 	}
 
 

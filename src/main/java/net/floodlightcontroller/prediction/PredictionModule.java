@@ -341,6 +341,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	public void setTimeout(int time){
 		this.SleepTimeout = time;
 	}
+	public int getTimeout(){ return this.SleepTimeout; }
 
 	public PredictionHandler getPredictionStructure(){
 		return predictionProvider;

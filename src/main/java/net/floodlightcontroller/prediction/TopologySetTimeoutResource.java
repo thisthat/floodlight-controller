@@ -1,18 +1,19 @@
 package net.floodlightcontroller.prediction;
 
 import org.restlet.resource.Post;
+import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+
 public class TopologySetTimeoutResource extends ServerResource {
-	/*
+
 	@Get("json")
     public String retrieve() throws FileNotFoundException, UnsupportedEncodingException {
-		String strTime = (String) getRequestAttributes().get("time");
-		int time = Integer.parseInt(strTime);
 		INetTopologyService pihr = (INetTopologyService)getContext().getAttributes().get(INetTopologyService.class.getCanonicalName());
-        pihr.setTimeout(time);
-        return "[]";
-    }*/
+        return "{ \"timeout\" : \"" + pihr.getTimeout() + "\"}";
+    }
 	
 	@Post
 	public String store(String in) {

@@ -67,7 +67,8 @@ public class ClassifierInfoResource extends ServerResource {
         out += "\"dpid\" : \"" + dpid + "\",";
         out += "\"classifier\" : \"" + node.getClassifierName() + "\",";
         out += "\"isLearning\" : \"" + node.getLearning() + "\",";
-        out += "\"modelPath\" : \"" + node.getModelPath() + "\"";
+        out += "\"modelPath\" : \"" + node.getModelPath() + "\",";
+        out += "\"loadedAt\" : \"" + node.getLoadedTimeStr() + "\"";
         out += "}\n";
         return out;
     }

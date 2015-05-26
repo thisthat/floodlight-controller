@@ -148,6 +148,7 @@
         </copy>
     </target>
 
+
     <target name="compile-tests" depends="compile-test"/>
     <target name="compile-test" depends="compile">
         <javac includeAntRuntime="false" debug="true" 
@@ -246,7 +247,7 @@
     </target>
     <target name="coverage" depends="instrument,test,coverage-report"/>
 
-    <target name="dist" depends="compile,compile-test">
+    <target name="dist" depends="compile">
         <jar destfile="${floodlight-jar}" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="${main-class}"/>
@@ -261,6 +262,7 @@
                 <patternset refid="lib"/>
             </zipgroupfileset>
         </jar>
+        <!--
         <jar destfile="${floodlight-test-jar}" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Class-Path" value="."/>
@@ -272,6 +274,7 @@
                 <patternset refid="lib-cobertura"/>
             </zipgroupfileset>
         </jar>
+    -->
     </target>
 
     <target name="deb" depends="dist">
