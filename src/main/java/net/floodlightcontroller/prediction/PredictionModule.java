@@ -356,6 +356,9 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	public MongoDBInfo getMongoDBConnection(){
 		return this.mongodb;
 	}
-
+	public void setMongoDBConnection(String ip, String port){
+		MongoDBInfo info = new MongoDBInfo(ip, port);
+		this.mongodb = info;
+	}
 
 }

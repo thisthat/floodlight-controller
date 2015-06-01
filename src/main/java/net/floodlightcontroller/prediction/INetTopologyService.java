@@ -11,4 +11,6 @@ public interface INetTopologyService extends IFloodlightService {
     int getTimeout();
     PredictionHandler getPredictionStructure();
     MongoDBInfo getMongoDBConnection();
+    void setMongoDBConnection(String ip, String port);
+
 }

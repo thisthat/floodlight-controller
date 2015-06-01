@@ -95,6 +95,25 @@ public class PredictionHandler {
 		}
 
 		/**
+		 * Setter
+		 * @param d: DataSetInfo with the new dataset to store w/ the node
+		 */
+		public void setDatasetInfo(DataSetInfo d){
+			this.ds = d;
+		}
+
+		/**
+		 * Setter
+		 * @param lags: Number of lags
+		 * @param derivative: To use or not the derivative
+		 * @param classSize: Size of buckets in the learning algorithm
+		 */
+		public void setDatasetInfo(int lags, boolean derivative, int classSize){
+			DataSetInfo d = new DataSetInfo(lags,derivative,classSize);
+			this.ds = d;
+		}
+
+		/**
 		 * Load a classifier from file
 		 * @param uri: file path of the model
 		 */

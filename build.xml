@@ -84,6 +84,7 @@
         <include name="hamcrest-library-1.3.jar"/>
         <include name="j3dutils.jar"/>
         <include name="weka.jar"/>
+        <include name="json.jar"/>
     </patternset>
 
     <path id="classpath">
