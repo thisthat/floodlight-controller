@@ -19,16 +19,20 @@ For more information about the original project, please visit: http://github.com
 # Example REST POST
 
 ## /wm/controller/topology
+```bash
 curl -s http://localhost:8080/wm/controller/topology -d '{ "type" : "json" }'
 curl -s http://localhost:8080/wm/controller/topology -d '{ "type" : "dot" }'
-
+```
 ## /wm/controller/topology/timeout 
+```bash
 curl -s http://localhost:8080/wm/controller/topology/timeout -d '{ "time" : "300" }'
-
+```
 ## /wm/controller/info/mongoDB 
+```bash
 curl -s http://localhost:8080/wm/controller/info/mongoDB -d '{ "ip" : "127.0.0.1" , "port" : "27071" }'
-
+```
 ## /wm/controller/prediction/{dpid}/dataset
+```bash
 curl -s http://localhost:8080/wm/controller/prediction/all/dataset -d '[ { "dpid" : "00:00:00:00:00:00:00:02", "lags" : "8", "derivative" : "false", "classSize" : "800" } , { "dpid" : "00:00:00:00:00:00:00:01", "lags" : "10", "derivative" : "false", "classSize" : "1000" }]'       
 curl -s http://localhost:8080/wm/controller/prediction/00:00:00:00:00:00:00:02/dataset -d '{ "lags" : "8", "derivative" : "false", "classSize" : "800" }'
-
+```
