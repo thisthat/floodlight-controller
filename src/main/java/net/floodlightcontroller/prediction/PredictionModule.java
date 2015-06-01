@@ -32,7 +32,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	protected ILinkDiscoveryService topology;
 	protected List<SwitchNode> switches = new ArrayList<SwitchNode>();
 	protected List<SwitchEdge> graph = new ArrayList<SwitchEdge>();
-	public class SwitchNode extends Object{
+	public class SwitchNode {
 		private String dpid;
 		public SwitchNode(String n){
 			dpid = n;
@@ -46,7 +46,9 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		}
 		@Override
 		public boolean equals(Object n){
-			return ((SwitchNode) n).getName() == this.dpid;
+			if(n.getClass().equals(this.getClass()))
+				return ((SwitchNode) n).getName().equals(this.dpid);
+			return false;
 		}
 	}
 	public class SwitchEdge {
@@ -71,6 +73,9 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	//Thread To handle the reconfiguration of the network
 	protected int SleepTimeout = 5 * 60 * 1000; // 5min in ms
 	protected Thread createTopologyThread;
+
+	//MongoDB resource
+	protected MongoDBInfo mongodb = new MongoDBInfo();
 	
 	
 	/*
@@ -196,6 +201,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	public class GenerateTopologyAsync implements Runnable {
 
 	    private PredictionModule _class;
+		private boolean isRunning = true;
 
 	    public GenerateTopologyAsync(Object o) {
 	        this._class = (PredictionModule) o;
@@ -209,7 +215,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-	    	while(true){
+	    	while(isRunning){
 	    		//Create the topology
 		    	_class.createTopology();
 		    	try {
@@ -224,7 +230,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	
 	//Build the data structure that take care of the topology
 	public void createTopology(){
-		Map<Link, LinkInfo> links = new HashMap<Link, LinkInfo>();
+		Map<Link, LinkInfo> links;
 		links = topology.getLinks();
 		graph.clear();
 		switches.clear();
@@ -346,4 +352,10 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	public PredictionHandler getPredictionStructure(){
 		return predictionProvider;
 	}
+
+	public MongoDBInfo getMongoDBConnection(){
+		return this.mongodb;
+	}
+
+
 }

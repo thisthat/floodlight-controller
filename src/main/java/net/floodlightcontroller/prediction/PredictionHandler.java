@@ -27,8 +27,9 @@ public class PredictionHandler {
 		private String modelPath = "";
 		private static final String defaultUri = "prediction/default.model";
 		private java.util.Date lastLoad = new java.util.Date(0);
+		private DataSetInfo ds = new DataSetInfo();
 
-		public PredictionNode(){};
+		public PredictionNode(){}
 
 		/**
 		 * Create the classifier from file and setting the learning as False
@@ -86,6 +87,14 @@ public class PredictionHandler {
 		}
 
 		/**
+		 * Getter
+		 * @return the current info of the dataset for the node is build
+		 */
+		public DataSetInfo getDatasetInfo(){
+			return ds;
+		}
+
+		/**
 		 * Load a classifier from file
 		 * @param uri: file path of the model
 		 */
@@ -118,7 +127,7 @@ public class PredictionHandler {
 	}
 
 
-	public PredictionHandler(){};
+	public PredictionHandler(){}
 
 	/**
 	 * Set the current switches in the network

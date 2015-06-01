@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
- <!--
-   Copyright 2011, Big Switch Networks, Inc.
-   
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
+<!--
+  Copyright 2011, Big Switch Networks, Inc.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 
 <!--
@@ -77,11 +77,11 @@
         <include name="findbugs-annotations-2.0.1.jar" />
         <include name="findbugs-jsr305-2.0.1.jar" />
         <include name="derby-10.9.1.0.jar"/>
-    	<include name="openflowj-0.9.0-SNAPSHOT.jar"/>
-    	<include name="openflowj-0.9.0-SNAPSHOT-javadoc.jar"/>
-    	<include name="hamcrest-core-1.3.jar"/>
-    	<include name="hamcrest-integration-1.3.jar"/>
-    	<include name="hamcrest-library-1.3.jar"/>
+        <include name="openflowj-0.9.0-SNAPSHOT.jar"/>
+        <include name="openflowj-0.9.0-SNAPSHOT-javadoc.jar"/>
+        <include name="hamcrest-core-1.3.jar"/>
+        <include name="hamcrest-integration-1.3.jar"/>
+        <include name="hamcrest-library-1.3.jar"/>
         <include name="j3dutils.jar"/>
         <include name="weka.jar"/>
     </patternset>
@@ -111,7 +111,7 @@
     <path id="classpath-cobertura">
         <fileset dir="${lib}">
             <patternset refid="lib-cobertura"/>
-    </fileset>
+        </fileset>
     </path>
 
     <patternset id="lib-test">
@@ -137,11 +137,11 @@
     </target>
 
     <target name="compile" depends="init">
-        <javac includeAntRuntime="false" 
-           classpathref="classpath" 
-           debug="true" 
-           srcdir="${source}:${thrift.out.dir}"
-           destdir="${build}">
+        <javac includeAntRuntime="false"
+               classpathref="classpath"
+               debug="true"
+               srcdir="${source}:${thrift.out.dir}"
+               destdir="${build}">
         </javac>
         <copy todir="${build}">
             <fileset dir="${resources}" />
@@ -151,34 +151,34 @@
 
     <target name="compile-tests" depends="compile-test"/>
     <target name="compile-test" depends="compile">
-        <javac includeAntRuntime="false" debug="true" 
-           srcdir="${source-test}"
-           classpath="${build}"
-           classpathref="classpath-test"
-           destdir="${build-test}"/>
+        <javac includeAntRuntime="false" debug="true"
+               srcdir="${source-test}"
+               classpath="${build}"
+               classpathref="classpath-test"
+               destdir="${build-test}"/>
     </target>
 
     <target name="gen-thrift" depends="init">
-      <echo message="Running thrift on '${thrift.dir}'"/>
-      <apply executable="./thrift/compiler/cpp/thrift">
-	<fileset dir="${thrift.dir}" casesensitive="yes">
-	  <include name="**/*.thrift"/>
-	</fileset>
-	<arg value="--strict"/>
-	<arg value="-v"/>
-	<arg value="--gen"/>
-	<arg value="java"/>
-	<arg value="-o"/>
-	<arg value="${thrift.out.dir}/.."/>
-      </apply>
-      <echo message="Adding @SuppressWarning annotations"/>
-      <replaceregexp byline="true">
-	<regexp pattern="^public "/>
-	<substitution expression='@SuppressWarnings("all") public '/>
-	<fileset id="thrift.output.files" dir="${thrift.out.dir}/..">
-	  <include name="**/*.java"/>
-	</fileset>
-      </replaceregexp>
+        <echo message="Running thrift on '${thrift.dir}'"/>
+        <apply executable="./thrift/compiler/cpp/thrift">
+            <fileset dir="${thrift.dir}" casesensitive="yes">
+                <include name="**/*.thrift"/>
+            </fileset>
+            <arg value="--strict"/>
+            <arg value="-v"/>
+            <arg value="--gen"/>
+            <arg value="java"/>
+            <arg value="-o"/>
+            <arg value="${thrift.out.dir}/.."/>
+        </apply>
+        <echo message="Adding @SuppressWarning annotations"/>
+        <replaceregexp byline="true">
+            <regexp pattern="^public "/>
+            <substitution expression='@SuppressWarnings("all") public '/>
+            <fileset id="thrift.output.files" dir="${thrift.out.dir}/..">
+                <include name="**/*.java"/>
+            </fileset>
+        </replaceregexp>
     </target>
 
     <target name="clean">
@@ -196,10 +196,10 @@
     <target name="tests" depends="test"/>
     <target name="test" depends="compile-test">
         <junit fork="true" forkmode="once"
-           failureproperty="junit.failure"
-           printsummary="on">
-        <sysproperty key="net.sourceforge.cobertura.datafile"
-             file="${target}/cobertura.ser" />
+               failureproperty="junit.failure"
+               printsummary="on">
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                         file="${target}/cobertura.ser" />
             <classpath>
                 <pathelement location="${build-coverage}"/>
                 <pathelement location="${build}"/>
@@ -212,7 +212,7 @@
             <batchtest todir="${test-output}">
                 <fileset dir="${source-test}">
                     <exclude name="**/storage/tests/StorageTest.java"/>
-				    <include name="**/*Test*.java"/>
+                    <include name="**/*Test*.java"/>
                     <exclude name="**/core/test/**"/>
                     <exclude name="**/core/module/**"/>
                 </fileset>
@@ -227,23 +227,23 @@
         <delete dir="${build-coverage}"/>
     </target>
     <target name="instrument" depends="compile,compile-test,clean-instrument">
-      <cobertura-instrument datafile="${target}/cobertura.ser"
-                todir="${build-coverage}"
-                classpathref="classpath-cobertura">
-    <fileset dir="${build}">
-      <include name="**/*.class"/>
-    </fileset>
-      </cobertura-instrument>
+        <cobertura-instrument datafile="${target}/cobertura.ser"
+                              todir="${build-coverage}"
+                              classpathref="classpath-cobertura">
+            <fileset dir="${build}">
+                <include name="**/*.class"/>
+            </fileset>
+        </cobertura-instrument>
     </target>
     <target name="coverage-report">
         <cobertura-report format="html"
-              datafile="${target}/cobertura.ser"
-              destdir="${coverage-output}"
-              srcdir="${source}"/>
+                          datafile="${target}/cobertura.ser"
+                          destdir="${coverage-output}"
+                          srcdir="${source}"/>
         <cobertura-report format="xml"
-              datafile="${target}/cobertura.ser"
-              destdir="${coverage-output}"
-              srcdir="${source}"/>
+                          datafile="${target}/cobertura.ser"
+                          destdir="${coverage-output}"
+                          srcdir="${source}"/>
     </target>
     <target name="coverage" depends="instrument,test,coverage-report"/>
 
@@ -278,63 +278,63 @@
     </target>
 
     <target name="deb" depends="dist">
-      <taskdef name="deb" 
-	       classname="org.vafer.jdeb.ant.DebAntTask" 
-	       classpathref="package-classpath"/>
+        <taskdef name="deb"
+                 classname="org.vafer.jdeb.ant.DebAntTask"
+                 classpathref="package-classpath"/>
 
-      <copy todir="${target}/debian">
-	<fileset dir="debian"/>
-	<filterset begintoken="[[" endtoken="]]">
-	  <filter token="version" value="1.9.0"/>
-	  <filter token="name" value="${ant.project.name}"/>
-	</filterset>
-      </copy>
+        <copy todir="${target}/debian">
+            <fileset dir="debian"/>
+            <filterset begintoken="[[" endtoken="]]">
+                <filter token="version" value="1.9.0"/>
+                <filter token="name" value="${ant.project.name}"/>
+            </filterset>
+        </copy>
 
-      <deb destfile="${target}/floodlight-1.9.0.deb" 
-	   control="${target}/debian/control">
-	<data src="${floodlight-jar}" type="file">
-	  <mapper type="perm" prefix="/usr/share/floodlight/java"/>
-	</data>
-	<tarfileset dir="debian/misc/bin" prefix="/usr/bin" filemode="755"/>
-	<data src="debian/misc/logrotate/floodlight" type="file">
-	  <mapper type="perm" prefix="/etc/logrotate.d"/>
-	</data>
-	<data src="debian/misc/init/floodlight.conf" type="file">
-	  <mapper type="perm" prefix="/etc/init"/>
-	</data>
-	<data src="debian/misc/logback.xml" type="file">
-	  <mapper type="perm" prefix="/etc/floodlight"/>
-	</data>
-	<data src="debian/misc/rsyslog/10-floodlight.conf" type="file">
-	  <mapper type="perm" prefix="/etc/rsyslog.d"/>
-	</data>
-	<data src="debian/misc/default/floodlight" type="file">
-	  <mapper type="perm" prefix="/etc/default"/>
-	</data>
-	<data src="debian/misc/floodlight.properties" type="file">
-	  <mapper type="perm" prefix="/etc/floodlight"/>
-	</data>
-	<tarfileset dir="src/main/resources/apps" prefix="/etc/floodlight/apps.d"/>
-      </deb>
+        <deb destfile="${target}/floodlight-1.9.0.deb"
+             control="${target}/debian/control">
+            <data src="${floodlight-jar}" type="file">
+                <mapper type="perm" prefix="/usr/share/floodlight/java"/>
+            </data>
+            <tarfileset dir="debian/misc/bin" prefix="/usr/bin" filemode="755"/>
+            <data src="debian/misc/logrotate/floodlight" type="file">
+                <mapper type="perm" prefix="/etc/logrotate.d"/>
+            </data>
+            <data src="debian/misc/init/floodlight.conf" type="file">
+                <mapper type="perm" prefix="/etc/init"/>
+            </data>
+            <data src="debian/misc/logback.xml" type="file">
+                <mapper type="perm" prefix="/etc/floodlight"/>
+            </data>
+            <data src="debian/misc/rsyslog/10-floodlight.conf" type="file">
+                <mapper type="perm" prefix="/etc/rsyslog.d"/>
+            </data>
+            <data src="debian/misc/default/floodlight" type="file">
+                <mapper type="perm" prefix="/etc/default"/>
+            </data>
+            <data src="debian/misc/floodlight.properties" type="file">
+                <mapper type="perm" prefix="/etc/floodlight"/>
+            </data>
+            <tarfileset dir="src/main/resources/apps" prefix="/etc/floodlight/apps.d"/>
+        </deb>
     </target>
     <target name="package" depends="deb"/>
 
     <target name="javadoc">
         <javadoc access="protected"
-            author="true"
-            classpathref="classpath"
-            destdir="${docs}"
-            doctitle="Floodlight"
-            nodeprecated="false"
-            nodeprecatedlist="false"
-            noindex="false"
-            nonavbar="false"
-            notree="false"
-            source="1.7"
-            sourcepath="${source}"
-            splitindex="true"
-            use="true"
-            version="true"/>
+                 author="true"
+                 classpathref="classpath"
+                 destdir="${docs}"
+                 doctitle="Floodlight"
+                 nodeprecated="false"
+                 nodeprecatedlist="false"
+                 noindex="false"
+                 nonavbar="false"
+                 notree="false"
+                 source="1.7"
+                 sourcepath="${source}"
+                 splitindex="true"
+                 use="true"
+                 version="true"/>
     </target>
 
     <target name="eclipse" depends="init">
@@ -355,17 +355,17 @@
         <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${findbugs.home}/lib/findbugs-ant.jar"/>
         <mkdir dir="${findbugs.results}"/>
         <findbugs
-            home="${findbugs.home}"
-            output="xml"
-            excludeFilter="${basedir}/findbugs-exclude.xml"
-            jvmargs="-Xmx1024m"
-            outputFile="${findbugs.results}/results.xml">
-           <sourcePath path="${source}" />
-           <sourcePath path="${thrift.out.dir}" />
-           <class location="${build}" />
-           <auxClasspath>
+                home="${findbugs.home}"
+                output="xml"
+                excludeFilter="${basedir}/findbugs-exclude.xml"
+                jvmargs="-Xmx1024m"
+                outputFile="${findbugs.results}/results.xml">
+            <sourcePath path="${source}" />
+            <sourcePath path="${thrift.out.dir}" />
+            <class location="${build}" />
+            <auxClasspath>
                 <path refid="classpath" />
-           </auxClasspath>
+            </auxClasspath>
         </findbugs>
     </target>
 
@@ -373,17 +373,17 @@
         <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${findbugs.home}/lib/findbugs-ant.jar"/>
         <mkdir dir="${findbugs.results}"/>
         <findbugs
-            home="${findbugs.home}"
-            output="html"
-            excludeFilter="${basedir}/findbugs-exclude.xml"
-            jvmargs="-Xmx1024m"
-            outputFile="${findbugs.results}/results.html" >
-           <sourcePath path="${source}" />
-           <sourcePath path="${thrift.out.dir}" />
-           <class location="${build}" />
-           <auxClasspath>
+                home="${findbugs.home}"
+                output="html"
+                excludeFilter="${basedir}/findbugs-exclude.xml"
+                jvmargs="-Xmx1024m"
+                outputFile="${findbugs.results}/results.html" >
+            <sourcePath path="${source}" />
+            <sourcePath path="${thrift.out.dir}" />
+            <class location="${build}" />
+            <auxClasspath>
                 <path refid="classpath" />
-           </auxClasspath>
+            </auxClasspath>
         </findbugs>
     </target>
 

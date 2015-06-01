@@ -18,6 +18,9 @@ public class BindUrlWebRoutable implements RestletRoutable {
         router.attach("/topology/timeout", TopologySetTimeoutResource.class);
         router.attach("/prediction/{" + PRED_STATS + "}/json", ClassifierInfoResource.class);
         router.attach("/prediction/{" + DPID + "}/reload", ClassifierReloadResource.class);
+        router.attach("/info/mongoDB", MongoDBResource.class);
+        router.attach("/prediction/{" + DPID + "}/dataset", DatasetNodeInfoResource.class);
+
         return router;
     }
  
