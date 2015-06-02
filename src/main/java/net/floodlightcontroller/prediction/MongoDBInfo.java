@@ -128,20 +128,16 @@ public class MongoDBInfo {
      */
     public String jsonDatatime(){
         String out = "[";
-        MongoCursor<Document> cursor = datatimeCollection.find().iterator();
-        try {
+        try (MongoCursor<Document> cursor = datatimeCollection.find().iterator()) {
             while (cursor.hasNext()) {
                 out += cursor.next().toJson();
-                if(cursor.hasNext()){
+                if (cursor.hasNext()) {
                     out += ",\n";
                 }
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             out = e.getMessage();
-        }
-        finally {
-            cursor.close();
+        } finally {
             out += "]";
         }
         return out;
@@ -165,32 +161,29 @@ public class MongoDBInfo {
         int j = 0;
         int prevByte = 0;
         for(int i = 0; i < dt.length; i++){
-            MongoCursor<Document> cursor = switchflowdataCollection.
+            try (
+                    MongoCursor<Document> cursor = switchflowdataCollection.
                     find(
-                         Filters.and(
-                             Filters.eq("DPID", dpid),
-                             Filters.eq("_time", Integer.parseInt(dt[i]))
-                         )
+                            Filters.and(
+                                    Filters.eq("DPID", dpid),
+                                    Filters.eq("_time", Integer.parseInt(dt[i]))
+                            )
                     )
                     .sort(Sorts.descending("_time"))
                     .limit(n)
-                    .iterator();
-            try {
+                    .iterator()
+            ) {
                 int _byte = 0;
                 while (cursor.hasNext()) {
                     String byteCount = cursor.next().get("byteCount").toString();
                     _byte += Integer.parseInt(byteCount);
                 }
-                if(i > 0) { //Skip the first
+                if (i > 0) { //Skip the first
                     out[j++] = (_byte - prevByte) + "";
                 }
                 prevByte = _byte;
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 out[0] = e.getMessage();
-            }
-            finally {
-                cursor.close();
             }
         }
 
@@ -203,12 +196,12 @@ public class MongoDBInfo {
      * @return an array of n element with the measurement
      */
     public String[] getSwitchLastMeasurement(String dpid, int n){
-        return getSwitchLastMeasurement(dpid, n, false);
+        return getSwitchLastMeasurement(dpid, n, true);
     }
 
     /**
      * Get the last <b>n</b> DataTime values
-     * @param n
+     * @param n : Number of element to retrive
      * @return Array of <b>n</b> elements with the values of last time measurements
      */
     public String[] getLastDataTime(int n){
@@ -217,28 +210,25 @@ public class MongoDBInfo {
         }
         String[] out = new String[n];
         int i = 0;
-        MongoCursor<Document> cursor = datatimeCollection
+        try (
+                MongoCursor<Document> cursor = datatimeCollection
                 .find()
                 .sort(Sorts.descending("_time"))
                 .limit(n)
-                .iterator();
-        try {
+                .iterator()
+        ) {
             while (cursor.hasNext()) {
                 out[i++] = cursor.next().get("_time").toString();
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             out[0] = e.getMessage();
-        }
-        finally {
-            cursor.close();
         }
         return out;
     }
 
     /**
      * Get the last <b>n</b> DataTime values
-     * @param n
+     * @param n : Number of elements to retrive
      * @param revert : Defines if reverse the order of output
      * @return Array of <b>n</b> elements with the values of last time measurements
      */

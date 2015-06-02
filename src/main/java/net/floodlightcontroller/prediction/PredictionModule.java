@@ -358,15 +358,21 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		return this.mongodb;
 	}
 	public void setMongoDBConnection(String ip, String port){
-		MongoDBInfo info = new MongoDBInfo(ip, port);
-		this.mongodb = info;
+		this.mongodb = new MongoDBInfo(ip, port);
 		this.mongodb.connect();
 	}
 
 
 	public String test(){
 		String dpid = switches.get(0).getName();
-		return predictionProvider.getSwitch(dpid).getDatasetInfo().generateHeader();
+		System.out.println("Switch: " + dpid);
+		try {
+			String[] data = this.mongodb.getSwitchLastMeasurement(dpid,5,true);
+			return predictionProvider.getSwitch(dpid).getDatasetInfo().generateARFFFromData(data);
+		}
+		catch(Exception e){
+			return e.getMessage();
+		}
 	}
 
 }

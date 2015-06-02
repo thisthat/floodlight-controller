@@ -1,8 +1,11 @@
 package net.floodlightcontroller.prediction;
 
+import net.floodlightcontroller.prediction.Exception.NotCorrespondingInstanceNumberException;
 import net.floodlightcontroller.prediction.PredictionModule.SwitchNode;
 import weka.classifiers.AbstractClassifier;
+import weka.core.Instances;
 import weka.core.SerializationHelper;
+import weka.core.converters.ConverterUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +31,7 @@ public class PredictionHandler {
 		private static final String defaultUri = "prediction/default.model";
 		private java.util.Date lastLoad = new java.util.Date(0);
 		private DataSetInfo ds = new DataSetInfo();
+
 
 		public PredictionNode(){}
 
@@ -109,8 +113,7 @@ public class PredictionHandler {
 		 * @param classSize: Size of buckets in the learning algorithm
 		 */
 		public void setDatasetInfo(int lags, boolean derivative, int classSize){
-			DataSetInfo d = new DataSetInfo(lags,derivative,classSize);
-			this.ds = d;
+			this.ds = new DataSetInfo(lags,derivative,classSize);
 		}
 
 		/**
@@ -142,11 +145,48 @@ public class PredictionHandler {
 			loadClassifierFromFile(this.modelPath);
 		}
 
+		/**
+		 * Return the name of the class of traffic for the prediction
+		 * @param filePath : file path of the arff file
+		 * @return the name of the class of the prediction
+		 * @throws Exception : if the number of instances is not one
+		 */
+		public String executePredictionClassName(String filePath) throws Exception {
+			ConverterUtils.DataSource ds = new ConverterUtils.DataSource(filePath);
+			Instances dataset = ds.getDataSet();
+			dataset.setClassIndex(dataset.numAttributes() - 1);
+			//There must exists only one instance
+			if(dataset.numInstances() != 1){
+				throw new NotCorrespondingInstanceNumberException();
+			}
+			double classPred = classifier.classifyInstance(dataset.instance(0));
+			return dataset.classAttribute().value((int) classPred);
+		}
+
+		/**
+		 * Return the index of the class for the prediction
+		 * @param filePath : file path of the arff file
+		 * @return the name of the class of the prediction
+		 * @throws Exception : if the number of instances is not one
+		 */
+		public int executePredictionClassIndex(String filePath) throws Exception {
+			ConverterUtils.DataSource ds = new ConverterUtils.DataSource(filePath);
+			Instances dataset = ds.getDataSet();
+			dataset.setClassIndex(dataset.numAttributes() - 1);
+			//There must exists only one instance
+			if(dataset.numInstances() != 1){
+				throw new NotCorrespondingInstanceNumberException();
+			}
+			double classPred = classifier.classifyInstance(dataset.instance(0));
+			return (int)classPred;
+		}
+
+
 
 	}
 
 
-	public PredictionHandler(){}
+	public PredictionHandler(){	}
 
 	/**
 	 * Set the current switches in the network

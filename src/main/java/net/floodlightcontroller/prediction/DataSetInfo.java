@@ -1,9 +1,13 @@
 package net.floodlightcontroller.prediction;
 
-import net.floodlightcontroller.prediction.Exception.NotCorrespondingLagSize;
+import net.floodlightcontroller.prediction.Exception.NotCorrespondingLagSizeException;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -44,31 +48,69 @@ public class DataSetInfo {
         return derivative;
     }
 
-    public String generateARFFFromData(String[] data) throws NotCorrespondingLagSize, IOException {
+
+    public String generateARFFFromData(String[] data) throws NotCorrespondingLagSizeException, IOException {
+        return generateARFFFromData(data, new Date().getTime() / 1000);
+    }
+
+    public String generateARFFFromData(String[] data, long timeClass) throws NotCorrespondingLagSizeException, IOException {
         if(data.length != lags){
-            throw new NotCorrespondingLagSize();
+            throw new NotCorrespondingLagSizeException();
         }
         long time = new java.util.Date().getTime();
         int rand = new Random().nextInt(10000);
         File temp = File.createTempFile("prediction" + time + "_" + rand, ".arff");
+        FileWriter fw = new FileWriter(temp.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        //Write Header
+        bw.write(generateHeader());
+        //Write Instance
+        bw.write(generateInstance(timeClass, data));
+        bw.close();
         return temp.getAbsolutePath();
     }
 
+    /**
+     * Generate the instance
+     * @return the string with the instance in ARFF format
+     */
+    private String generateInstance(long time, String[] data) {
+        String out = getClassTime(time) + ",";
+        for(int i = 0; i < data.length; i++){
+            //Data is in Byte, so convert to KByte
+            out += ( Integer.parseInt(data[i]) / 1024 ) + ",";
+            if(this.derivative && i > 0){
+                out += ( Integer.parseInt(data[i]) - Integer.parseInt(data[i-1]) ) / 1024 + ",";
+            }
+        }
+        out += "?"; //The Prediction!
+        return out;
+    }
 
-    /*
-    @relation dataset_1
-@attribute time_class {'time_0','time_1','time_2','time_3','time_4','time_5','time_6','time_7','time_8','time_9','time_10','time_11','time_12','time_13','time_14','time_15','time_16','time_17','time_18','time_19','time_20','time_21','time_22','time_23'}
-@attribute bandwidth_0 numeric
-@attribute d_bandwidth_0 numeric
-@attribute bandwidth_1 numeric
-@attribute d_bandwidth_1 numeric
-@attribute bandwidth_2 numeric
-@attribute d_bandwidth_2 numeric
-@attribute bandwidth_3 numeric
-@attribute d_bandwidth_3 numeric
-@attribute bandwidth_4 numeric
-@attribute prediction_class {'byte_0','byte_500','byte_1000','byte_1500','byte_2000','byte_2500','byte_3000','byte_3500','byte_4000','byte_4500','byte_5000','byte_5500','byte_6000','byte_6500','byte_7000','byte_7500','byte_8000','byte_8500','byte_9000','byte_9500','byte_10000'}
-@data
+    /**
+     * Convert the current unix timestamp (seconds) to the correspondent class for our weka model
+     * @return class in terms of ARFF model
+     */
+    private String getClassTime(){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(new Date().getTime());
+        return "time_" + c.get(Calendar.HOUR_OF_DAY);
+    }
+
+    /**
+     * Convert the unix timestamp (seconds) to the correspondent class for our weka model
+     * @param time : Time of the day in second
+     * @return class in terms of ARFF model
+     */
+    private String getClassTime(long time){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(time*1000);
+        return "time_" + c.get(Calendar.HOUR_OF_DAY);
+    }
+
+    /**
+     * Generate ARFF File Header for our model
+     * @return the string that contents the header of the ARFF file
      */
     public String generateHeader(){
         String out = "@relation dataset_1\n";
@@ -84,7 +126,7 @@ public class DataSetInfo {
         //Generate bandwidth
         for(int i  = 0; i < this.lags; i++){
             out += "@attribute bandwidth_" + i + " numeric\n";
-            if(this.derivative){
+            if(this.derivative && i > 0){
                 out += "@attribute d_bandwidth_" + i + " numeric\n";
             }
         }
