@@ -13,6 +13,7 @@
 | /wm/controller/prediction/{dpid}/reload | GET        | json  | Force the reload of the classifier for a switch |
 | /wm/controller/info/mongoDB           | GET/POST     | json | Get/Set IP and PORT of mongoDB connection |
 | /wm/controller/prediction/{dpid}/dataset | GET/POST  | json | dpid: *all* or *dpid* of a switch. Get/Set features for the dataset |
+| /wm/controller/prediction/{dpid}/execute | GET       | json | dpid: *all* or *dpid* of a switch. Get the prediction of the load af a node |
 
 For more information about the original project, please visit: http://github.com/floodlight/
 
@@ -35,4 +36,10 @@ curl -s http://localhost:8080/wm/controller/info/mongoDB -d '{ "ip" : "127.0.0.1
 ```bash
 curl -s http://localhost:8080/wm/controller/prediction/all/dataset -d '[ { "dpid" : "00:00:00:00:00:00:00:02", "lags" : "8", "derivative" : "false", "classSize" : "800" } , { "dpid" : "00:00:00:00:00:00:00:01", "lags" : "10", "derivative" : "false", "classSize" : "1000" }]'       
 curl -s http://localhost:8080/wm/controller/prediction/00:00:00:00:00:00:00:02/dataset -d '{ "lags" : "8", "derivative" : "false", "classSize" : "800" }'
+```
+
+## /wm/controller/prediction/{dpid}/execute
+```bash
+curl -s http://localhost:8080/wm/controller/prediction/all/execute
+curl -s http://localhost:8080/wm/controller/prediction/00:00:00:00:00:00:00:01/execute
 ```
