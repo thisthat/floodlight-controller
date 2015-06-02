@@ -154,6 +154,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		GenerateTopologyAsync myRunnable = new GenerateTopologyAsync(this);
 		createTopologyThread = new Thread(myRunnable);
 		createTopologyThread.start();
+		mongodb.connect();
 	}
 	@Override
 	public void startUp(FloodlightModuleContext context)
@@ -359,6 +360,13 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	public void setMongoDBConnection(String ip, String port){
 		MongoDBInfo info = new MongoDBInfo(ip, port);
 		this.mongodb = info;
+		this.mongodb.connect();
+	}
+
+
+	public String test(){
+		String dpid = switches.get(0).getName();
+		return predictionProvider.getSwitch(dpid).getDatasetInfo().generateHeader();
 	}
 
 }

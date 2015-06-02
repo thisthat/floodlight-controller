@@ -85,6 +85,7 @@
         <include name="j3dutils.jar"/>
         <include name="weka.jar"/>
         <include name="json.jar"/>
+        <include name="mongo-java-driver-3.0.2.jar"/>
     </patternset>
 
     <path id="classpath">
