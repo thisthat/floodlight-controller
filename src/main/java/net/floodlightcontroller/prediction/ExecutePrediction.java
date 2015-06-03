@@ -13,22 +13,22 @@ public class ExecutePrediction extends ServerResource {
         MongoDBInfo info = service.getMongoDBConnection();
         PredictionHandler prediction = service.getPredictionStructure();
         String dpid = (String) getRequestAttributes().get(BindUrlWebRoutable.DPID);
+        String type = (String) getRequestAttributes().get(BindUrlWebRoutable.TYPE);
         String out = "[\n";
         if(dpid.equals("all")){
             Map<String, PredictionHandler.PredictionNode> m = service.getPredictionStructure().getSwitches();
             //Foreach switch
             for(Map.Entry<String, PredictionHandler.PredictionNode> entry : m.entrySet()) {
-                //Get the objs that contains the structures
-                DataSetInfo ds = entry.getValue().getDatasetInfo();
                 String _dpid = entry.getKey();
-                //Get data
-                String[] data = info.getSwitchLastMeasurement(_dpid, ds.getLags());
                 try {
-                    //Generate file
-                    String path = ds.generateARFFFromData(data);
-                    //Execute the prediction
-                    String classPredicted = entry.getValue().executePredictionClassName(path);
-                    out += "{ \"DPID\" : \"" + _dpid + "\", \"prediction\" : \"" + classPredicted + "\"},";
+                    String _Predicted = "";
+                    if(type.equals("class")){
+                        _Predicted = prediction.getSwitch(_dpid).executePredictionClassName();
+                    }
+                    else {
+                        _Predicted = prediction.getSwitch(_dpid).executePredictionClassIndex() + "";
+                    }
+                    out += "{ \"DPID\" : \"" + _dpid + "\", \"prediction\" : \"" + _Predicted + "\"},";
                 } catch (Exception e) {
                     return "{ \"status\" : \"err\", \"message\" : \"" + e.getMessage() + "::" +  e.getClass() + "\" }";
                 }
@@ -37,15 +37,15 @@ public class ExecutePrediction extends ServerResource {
         }
         //Signle switch
         else {
-            PredictionHandler.PredictionNode node = service.getPredictionStructure().getSwitch(dpid);
-            DataSetInfo ds = node.getDatasetInfo();
-            String[] data = info.getSwitchLastMeasurement(dpid, ds.getLags());
             try {
-                //Generate file
-                String path = ds.generateARFFFromData(data);
-                //Execute the prediction
-                String classPredicted = node.executePredictionClassName(path);
-                return "{ \"DPID\" : \"" + dpid + "\", \"prediction\" : \"" + classPredicted + "\"}\n";
+                String _Predicted = "";
+                if(type.equals("class")){
+                    _Predicted = prediction.getSwitch(dpid).executePredictionClassName();
+                }
+                else {
+                    _Predicted = prediction.getSwitch(dpid).executePredictionClassIndex() + "";
+                }
+                return "{ \"DPID\" : \"" + dpid + "\", \"prediction\" : \"" + _Predicted + "\"}\n";
             } catch (Exception e) {
                 return "{ \"status\" : \"err\", \"message\" : \"" + e.getMessage() + "\" }";
             }

@@ -9,6 +9,7 @@ public class BindUrlWebRoutable implements RestletRoutable {
 
     public static final String PRED_STATS = "pred_stats";
     public static final String DPID = "dpid";
+    public static final String TYPE = "type";
 
     @Override
     public Restlet getRestlet(Context context) {
@@ -20,7 +21,7 @@ public class BindUrlWebRoutable implements RestletRoutable {
         router.attach("/prediction/{" + DPID + "}/reload", ClassifierReloadResource.class);
         router.attach("/info/mongoDB", MongoDBResource.class);
         router.attach("/prediction/{" + DPID + "}/dataset", DatasetNodeInfoResource.class);
-        router.attach("/prediction/{" + DPID + "}/execute", ExecutePrediction.class);
+        router.attach("/prediction/{" + DPID + "}/{" + TYPE + "}/execute", ExecutePrediction.class);
         router.attach("/test", TestResource.class);
         return router;
     }

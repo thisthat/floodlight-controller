@@ -20,6 +20,7 @@ import java.util.Map;
 public class PredictionHandler {
 	private String _folder = "prediction/";
 	protected Map<String, PredictionNode> prediction = new HashMap<String, PredictionNode>();
+	protected MongoDBInfo mongodb;
 
 	/**
 	 * Handle the Prediction Strucutre for a node
@@ -31,15 +32,18 @@ public class PredictionHandler {
 		private static final String defaultUri = "prediction/default.model";
 		private java.util.Date lastLoad = new java.util.Date(0);
 		private DataSetInfo ds = new DataSetInfo();
+		private MongoDBInfo mongodb;
+		private String dpid;
 
-
-		public PredictionNode(){}
+		public PredictionNode(MongoDBInfo db, String id){ this.mongodb = db; this.dpid = id; }
 
 		/**
 		 * Create the classifier from file and setting the learning as False
 		 * @param uri: file path of the model
 		 */
-		public PredictionNode(String uri){
+		public PredictionNode(MongoDBInfo db, String id, String uri){
+			this.mongodb = db;
+			this.dpid = id;
 			modelPath = uri;
 			loadClassifierFromFile(uri);
 		}
@@ -49,7 +53,9 @@ public class PredictionHandler {
 		 * @param uri: file path of the model
 		 * @param learning: boolean flag to toggle the continous learning
 		 */
-		public PredictionNode(String uri, boolean learning){
+		public PredictionNode(MongoDBInfo db, String id,String uri, boolean learning){
+			this.mongodb = db;
+			this.dpid = id;
 			modelPath = uri;
 			loadClassifierFromFile(uri);
 			isLearning = learning;
@@ -164,6 +170,19 @@ public class PredictionHandler {
 		}
 
 		/**
+		 * Return the name of the class of traffic for the prediction
+		 * @return the name of the class of the prediction
+		 * @throws Exception if it cannot write the file or the number of instance is not one
+		 */
+		public String executePredictionClassName() throws Exception {
+			String[] data = mongodb.getSwitchLastMeasurement(this.dpid, ds.getLags());
+			//Generate file
+			String path = ds.generateARFFFromData(data);
+			//Execute the prediction
+			return executePredictionClassName(path);
+		}
+
+		/**
 		 * Return the index of the class for the prediction
 		 * @param filePath : file path of the arff file
 		 * @return the name of the class of the prediction
@@ -177,8 +196,21 @@ public class PredictionHandler {
 			if(dataset.numInstances() != 1){
 				throw new NotCorrespondingInstanceNumberException();
 			}
-			double classPred = classifier.classifyInstance(dataset.instance(0));
+			double classPred = 0;
+			classPred = classifier.classifyInstance(dataset.instance(0));
 			return (int)classPred;
+		}
+		/**
+		 * Return the index of the class for the prediction
+		 * @return the name of the class of the prediction
+		 * @throws Exception : if the number of instances is not one
+		 */
+		public int executePredictionClassIndex() throws Exception {
+			String[] data = mongodb.getSwitchLastMeasurement(this.dpid, ds.getLags());
+			//Generate file
+			String path = ds.generateARFFFromData(data);
+			//Execute the prediction
+			return executePredictionClassIndex(path);
 		}
 
 
@@ -186,7 +218,7 @@ public class PredictionHandler {
 	}
 
 
-	public PredictionHandler(){	}
+	public PredictionHandler(MongoDBInfo db){ this.mongodb = db; }
 
 	/**
 	 * Set the current switches in the network
@@ -199,7 +231,7 @@ public class PredictionHandler {
 			if(!prediction.containsKey(name)){
 				//Standard is {dpid}.model
 				String fileModel = _folder + name + ".model";
-				PredictionNode p = new PredictionNode(fileModel);
+				PredictionNode p = new PredictionNode(this.mongodb, name, fileModel);
 				prediction.put(name, p);
 			}
 		}
@@ -219,7 +251,7 @@ public class PredictionHandler {
 			}
 		}
 		System.out.println("======");
-		System.out.println(prediction.toString());
+		System.out.println("Prediction load " + prediction.size() + " switches");
 		System.out.println("======");
 	}
 
@@ -242,4 +274,6 @@ public class PredictionHandler {
 	public Map<String, PredictionNode> getSwitches(){
 		return prediction;
 	}
+
+
 }

@@ -26,7 +26,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	protected IRestApiService restApi;
 
 	//Contains all the info and logic of prediction the load of a node
-	protected PredictionHandler predictionProvider = new PredictionHandler();
+	protected PredictionHandler predictionProvider;
 	
 	//Data Structure to Build the network topology
 	protected ILinkDiscoveryService topology;
@@ -155,6 +155,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		createTopologyThread = new Thread(myRunnable);
 		createTopologyThread.start();
 		mongodb.connect();
+		predictionProvider = new PredictionHandler(mongodb);
 	}
 	@Override
 	public void startUp(FloodlightModuleContext context)
@@ -358,7 +359,8 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		return this.mongodb;
 	}
 	public void setMongoDBConnection(String ip, String port){
-		this.mongodb = new MongoDBInfo(ip, port);
+		this.mongodb.setIP(ip);
+		this.mongodb.setPORT(port);
 		this.mongodb.connect();
 	}
 

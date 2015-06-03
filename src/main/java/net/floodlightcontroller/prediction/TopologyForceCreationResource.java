@@ -11,6 +11,6 @@ public class TopologyForceCreationResource extends ServerResource {
 	public String retrieve() throws FileNotFoundException, UnsupportedEncodingException {
 		INetTopologyService pihr = (INetTopologyService)getContext().getAttributes().get(INetTopologyService.class.getCanonicalName());
 	   pihr.createTopology();
-	   return "{ 'msg' : 'topology created!' }";
+	   return "{ \"msg\" : \"topology created!\" }";
 	}
 }
