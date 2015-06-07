@@ -29,6 +29,8 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	protected PredictionHandler predictionProvider;
 	//Contains all the info and logic to handle the rules
 	protected RuleManager ruleProvider;
+	//Contains all the info and logic to handle the rules
+	protected BehaviourManager behaviourProvider;
 	
 	//Data Structure to Build the network topology
 	protected ILinkDiscoveryService topology;
@@ -159,6 +161,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		mongodb.connect();
 		predictionProvider = new PredictionHandler(mongodb);
 		ruleProvider = new RuleManager(mongodb);
+		behaviourProvider = new BehaviourManager(mongodb);
 	}
 	@Override
 	public void startUp(FloodlightModuleContext context)

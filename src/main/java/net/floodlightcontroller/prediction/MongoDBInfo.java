@@ -24,6 +24,7 @@ public class MongoDBInfo {
     public static String DataTime = "DataTime";
     public static String SwitchFlowData = "SwitchFlowData";
     public static String Rules = "Rules";
+    public static String Behaviours = "Behaviour";
 
     /**
      * Connection Variables
@@ -40,6 +41,7 @@ public class MongoDBInfo {
     private MongoCollection<Document> datatimeCollection;
     private MongoCollection<Document> switchflowdataCollection;
     private MongoCollection<Document> rulesCollection;
+    private MongoCollection<Document> behavioursCollection;
 
     /**
      * Different Constructors
@@ -118,6 +120,7 @@ public class MongoDBInfo {
         datatimeCollection = db.getCollection(this.DataTime);
         switchflowdataCollection = db.getCollection(this.SwitchFlowData);
         rulesCollection = db.getCollection(this.Rules);
+        behavioursCollection = db.getCollection(this.Behaviours);
     }
 
     /**
@@ -251,7 +254,7 @@ public class MongoDBInfo {
     }
 
     /**
-     * Get all the rules from the DV
+     * Get all the rules from the DB
      * @return List of the rules
      */
     public List<Rule> getRulesList(){
@@ -272,6 +275,52 @@ public class MongoDBInfo {
             System.out.println("Error: " + e.getMessage() + " :: " + e.getClass());
         }
         return rl;
+
+    }
+
+    public Rule getRuleByName(String name){
+        Rule r = null;
+        try (
+                MongoCursor<Document> cursor = rulesCollection.
+                        find( Filters.eq("name", name) )
+                        .iterator()
+        ) {
+            while (cursor.hasNext()) {
+                Document d = cursor.next();
+                r = new Rule( d.getString("name"), d.getString("sw"), d.getString("pri"), d.getString("inPt"), d.getString("act"), d.getInteger("createAt") );
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage() + " :: " + e.getClass());
+        }
+        return r;
+    }
+
+    /**
+     * Get all the behaviours from the DB
+     * @return List of the behaviours
+     */
+    public List<Behaviour> getBehavioursList(){
+        List<Behaviour> bl = new ArrayList<>();
+        try (
+                MongoCursor<Document> cursor = behavioursCollection.
+                        find()
+                        .iterator()
+        ) {
+            Behaviour b;
+            Rule r;
+            while (cursor.hasNext()) {
+                Document d = cursor.next();
+                r = getRuleByName(d.getString("rule"));
+                int load = Integer.parseInt(d.getString("load"));
+                b = new Behaviour( d.getString("sw"), d.getString("sym"), load, r , d.getInteger("createAt") );
+                bl.add(b);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage() + " :: " + e.getClass());
+        }
+        return bl;
 
     }
 

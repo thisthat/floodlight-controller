@@ -77,4 +77,31 @@ public class Rule{
     public void setCreatedAtMS(int createdAtMS) {
         this.createdAtMS = createdAtMS;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Rule rule = (Rule) o;
+
+        if (createdAtMS != rule.createdAtMS) return false;
+        if (name != null ? !name.equals(rule.name) : rule.name != null) return false;
+        if (dpid != null ? !dpid.equals(rule.dpid) : rule.dpid != null) return false;
+        if (priority != null ? !priority.equals(rule.priority) : rule.priority != null) return false;
+        if (inPort != null ? !inPort.equals(rule.inPort) : rule.inPort != null) return false;
+        return !(action != null ? !action.equals(rule.action) : rule.action != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (dpid != null ? dpid.hashCode() : 0);
+        result = 31 * result + (priority != null ? priority.hashCode() : 0);
+        result = 31 * result + (inPort != null ? inPort.hashCode() : 0);
+        result = 31 * result + (action != null ? action.hashCode() : 0);
+        result = 31 * result + createdAtMS;
+        return result;
+    }
 }
