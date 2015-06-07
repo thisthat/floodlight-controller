@@ -9,6 +9,9 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import org.bson.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Giovanni Liva on 02.06.15.
  * Class to store the connection info of MongoDB
@@ -20,6 +23,7 @@ public class MongoDBInfo {
      */
     public static String DataTime = "DataTime";
     public static String SwitchFlowData = "SwitchFlowData";
+    public static String Rules = "Rules";
 
     /**
      * Connection Variables
@@ -35,6 +39,7 @@ public class MongoDBInfo {
      */
     private MongoCollection<Document> datatimeCollection;
     private MongoCollection<Document> switchflowdataCollection;
+    private MongoCollection<Document> rulesCollection;
 
     /**
      * Different Constructors
@@ -112,6 +117,7 @@ public class MongoDBInfo {
         db = client.getDatabase(this.dbname);
         datatimeCollection = db.getCollection(this.DataTime);
         switchflowdataCollection = db.getCollection(this.SwitchFlowData);
+        rulesCollection = db.getCollection(this.Rules);
     }
 
     /**
@@ -242,6 +248,31 @@ public class MongoDBInfo {
             out[j++] = tmp[i];
         }
         return out;
+    }
+
+    /**
+     * Get all the rules from the DV
+     * @return List of the rules
+     */
+    public List<Rule> getRulesList(){
+        List<Rule> rl = new ArrayList<>();
+        try (
+                MongoCursor<Document> cursor = rulesCollection.
+                        find()
+                        .iterator()
+        ) {
+            Rule r;
+            while (cursor.hasNext()) {
+                Document d = cursor.next();
+                r = new Rule( d.getString("name"), d.getString("sw"), d.getString("pri"), d.getString("inPt"), d.getString("act"), d.getInteger("createAt") );
+                rl.add(r);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage() + " :: " + e.getClass());
+        }
+        return rl;
+
     }
 
 }
