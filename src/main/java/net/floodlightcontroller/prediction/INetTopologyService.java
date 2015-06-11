@@ -10,7 +10,7 @@ public interface INetTopologyService extends IFloodlightService {
     void setTimeout(int time);
     int getTimeout();
     PredictionHandler getPredictionStructure();
+    BehaviourManager getBehaviourStructure();
     MongoDBInfo getMongoDBConnection();
     void setMongoDBConnection(String ip, String port);
-    String test();
 }

@@ -373,16 +373,8 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 	}
 
 
-	public String test(){
-		String dpid = switches.get(0).getName();
-		System.out.println("Switch: " + dpid);
-		try {
-			String[] data = this.mongodb.getSwitchLastMeasurement(dpid,5,true);
-			return predictionProvider.getSwitch(dpid).getDatasetInfo().generateARFFFromData(data);
-		}
-		catch(Exception e){
-			return e.getMessage();
-		}
+	public BehaviourManager getBehaviourStructure(){
+		return behaviourProvider;
 	}
 
 }
