@@ -1,5 +1,6 @@
 package net.floodlightcontroller.prediction;
 
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -114,25 +115,30 @@ public class BehaviourManager {
         for(int i = 0; i < behaviours.size(); i++){
             b = behaviours.get(i);
             PredictionHandler.PredictionNode sw = prediction.getSwitch(b.getDPID());
-            try {
-                int classPredicted = sw.executePredictionClassIndex();
-                String POSTString = b.toJSON(classPredicted);
-                sendData(POSTString);
-            }
-            catch(Exception e){
-                System.out.println("[ERR] Failed behaviour :: " + e.getMessage() + " :: " + e.getClass());
-            }
+            System.out.println("SW: " + sw);
+            if(sw != null)
+                try {
+                    int classPredicted = sw.executePredictionClassIndex();
+                    String POSTString = b.toJSON(classPredicted);
+                    sendData(POSTString);
+                }
+                catch(Exception e){
+                    System.out.println("[ERR] Failed behaviour :: " + e.getMessage() + " :: " + e.getClass());
+                }
         }
     }
 
     private void sendData(String data) throws Exception {
-        String url = "http://127.0.0.1::8080/wm/staticflowpusher/json";
+        String url = "http://127.0.0.1:8080/wm/staticflowpusher/json";
         URL obj = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
         conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
         out.write(data);
         out.close();
+        new InputStreamReader(conn.getInputStream());
+        System.out.println("DATA SENT:: " + data);
     }
 
 
