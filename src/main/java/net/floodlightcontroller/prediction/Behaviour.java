@@ -36,9 +36,11 @@ public class Behaviour {
      * @param classIndex : Index of the class that rappresent the load of the network
      * @return true or fasle
      */
-    public boolean isApplicable(int classIndex){
-        if(this.symbol.equals(LESS))  return load <= classIndex;
-        else return load >= classIndex;
+    public boolean isApplicable(int classIndex, int classSize){
+        int middle = (classIndex * classSize) + (classIndex * (classSize+1) );
+        middle /= 2;
+        if(this.symbol.equals(LESS))  return load <= middle;
+        else return load >= middle;
     }
 
     /**
@@ -46,13 +48,13 @@ public class Behaviour {
      * @param classIndex: The load of the system to check if the rule has to be applyed or not!
      * @return the String in json conform with the Static Flow PUSH API
      */
-    public String toJSON(int classIndex){
+    public String toJSON(int classIndex, int classSize){
         String out = "{\n";
         out += "\"switch\" : \"" + this.rule.getDpid() + "\", \n";
         out += "\"name\" : \"" + this.rule.getName()  + "\", \n";
         out += "\"priority\" : \"" + this.rule.getPriority() + "\", \n";
         out += "\"in_port\" : \"" + this.rule.getInPort() + "\", \n";
-        out += "\"active\" : \"" + ( isApplicable(classIndex) ? "true" : "false" )  + "\", \n";
+        out += "\"active\" : \"" + ( isApplicable(classIndex, classSize) ? "true" : "false" )  + "\", \n";
         out += "\"actions\" : \"" + this.rule.getAction() + "\" \n";
         out += "}";
         return out;

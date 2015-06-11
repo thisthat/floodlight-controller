@@ -119,7 +119,7 @@ public class BehaviourManager {
             if(sw != null)
                 try {
                     int classPredicted = sw.executePredictionClassIndex();
-                    String POSTString = b.toJSON(classPredicted);
+                    String POSTString = b.toJSON(classPredicted, sw.getDatasetInfo().getClassSize() );
                     sendData(POSTString);
                 }
                 catch(Exception e){
@@ -138,7 +138,7 @@ public class BehaviourManager {
         out.write(data);
         out.close();
         new InputStreamReader(conn.getInputStream());
-        System.out.println("DATA SENT:: " + data);
+        //System.out.println("DATA SENT:: " + data);
     }
 
 
