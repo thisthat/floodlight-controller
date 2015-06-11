@@ -20,7 +20,7 @@ public class BehaviourManagerResource extends ServerResource {
         try {
             JSONObject jp = new JSONObject(in);
             String time = jp.getString("time");
-            service.setTimeout(Integer.parseInt(time));
+            service.getBehaviourStructure().setSleepTime(Integer.parseInt(time));
         }
         catch(Exception e){
             System.out.println(e.getMessage());
