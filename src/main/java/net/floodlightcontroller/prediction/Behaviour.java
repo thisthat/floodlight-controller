@@ -12,6 +12,9 @@ public class Behaviour {
     protected Rule rule;
     protected int createdAtMS;
 
+    public final String LESS = "<";
+    public final String GREATER = ">";
+
     /**
      * Construct a behaviour
      * @param sw : Switch DPID
@@ -28,6 +31,32 @@ public class Behaviour {
         this.createdAtMS = createdAtMS;
     }
 
+    /**
+     * Return if the behaviour is applicable or not with the load of the network
+     * @param classIndex : Index of the class that rappresent the load of the network
+     * @return true or fasle
+     */
+    public boolean isApplicable(int classIndex){
+        if(this.symbol.equals(LESS))  return load <= classIndex;
+        else return load >= classIndex;
+    }
+
+    /**
+     * Convert the behaviour in json to be used with the static flow api
+     * @param classIndex: The load of the system to check if the rule has to be applyed or not!
+     * @return the String in json conform with the Static Flow PUSH API
+     */
+    public String toJSON(int classIndex){
+        String out = "{\n";
+        out += "\"switch\" : \"" + this.rule.getDpid() + "\", \n";
+        out += "\"name\" : \"" + this.rule.getName()  + "\", \n";
+        out += "\"priority\" : \"" + this.rule.getPriority() + "\", \n";
+        out += "\"in_port\" : \"" + this.rule.getInPort() + "\", \n";
+        out += "\"active\" : \"" + ( isApplicable(classIndex) ? "true" : "false" )  + "\", \n";
+        out += "\"actions\" : \"" + this.rule.getAction() + "\" \n";
+        out += "}";
+        return out;
+    }
 
     public int getCreatedAtMS() {
         return createdAtMS;
@@ -37,28 +66,17 @@ public class Behaviour {
         this.createdAtMS = createdAtMS;
     }
 
-    public String getSw() {
+    public String getDPID() {
         return sw;
-    }
-
-    public void setSw(String sw) {
-        this.sw = sw;
     }
 
     public String getSymbol() {
         return symbol;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
 
     public int getLoad() {
         return load;
-    }
-
-    public void setLoad(int load) {
-        this.load = load;
     }
 
     public Rule getRule() {

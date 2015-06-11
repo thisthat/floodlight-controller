@@ -1,5 +1,8 @@
 package net.floodlightcontroller.prediction;
 
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class BehaviourManager {
             while(bm.isRunning()){
                 //Query the DB
                 bm.setBehaviours();
+                bm.checkBehaviours();
                 try {
                     Thread.sleep(bm.getSleepTime());
                 } catch (InterruptedException e) {
@@ -41,6 +45,9 @@ public class BehaviourManager {
 
     //List of behaviours
     protected List<Behaviour> behaviours = new ArrayList<>();
+    //Prediction Module
+    protected PredictionHandler prediction;
+
     protected MongoDBInfo mongodb;
     protected Thread getRulesThread;
     protected boolean isRunning = true;
@@ -48,12 +55,14 @@ public class BehaviourManager {
     protected int sleepTime =  5000;
 
 
-    public BehaviourManager(MongoDBInfo info) {
+    public BehaviourManager(MongoDBInfo info, PredictionHandler pred) {
         this.mongodb = info;
+        this.prediction = pred;
         startThread();
     }
-    public BehaviourManager(MongoDBInfo info, int sT) {
+    public BehaviourManager(MongoDBInfo info, PredictionHandler pred, int sT) {
         this.sleepTime = sT;
+        this.prediction = pred;
         this.mongodb = info;
         startThread();
     }
@@ -95,6 +104,38 @@ public class BehaviourManager {
         System.out.println("Behaviour Manager loaded " + behaviours.size() + " behaviours");
         System.out.println("======");
     }
+
+    /**
+     * Check whenever a Behaviour is applyable and fires it in case!
+     */
+    public void checkBehaviours(){
+        //Going through the current behaviours
+        Behaviour b;
+        for(int i = 0; i < behaviours.size(); i++){
+            b = behaviours.get(i);
+            PredictionHandler.PredictionNode sw = prediction.getSwitch(b.getDPID());
+            try {
+                int classPredicted = sw.executePredictionClassIndex();
+                String POSTString = b.toJSON(classPredicted);
+                sendData(POSTString);
+            }
+            catch(Exception e){
+                System.out.println("[ERR] Failed behaviour :: " + e.getMessage() + " :: " + e.getClass());
+            }
+        }
+    }
+
+    private void sendData(String data) throws Exception {
+        String url = "http://127.0.0.1::8080/wm/staticflowpusher/json";
+        URL obj = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+        conn.setRequestMethod("POST");
+        OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+        out.write(data);
+        out.close();
+    }
+
+
 
     /**
      * Set the current active behaviours gettin the info from the database

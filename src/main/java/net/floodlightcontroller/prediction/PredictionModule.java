@@ -159,7 +159,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		createTopologyThread.start();
 		mongodb.connect();
 		predictionProvider = new PredictionHandler(mongodb);
-		behaviourProvider = new BehaviourManager(mongodb);
+		behaviourProvider = new BehaviourManager(mongodb, predictionProvider);
 	}
 	@Override
 	public void startUp(FloodlightModuleContext context)
