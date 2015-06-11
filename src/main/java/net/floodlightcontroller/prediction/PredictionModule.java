@@ -27,8 +27,7 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 
 	//Contains all the info and logic of prediction the load of a node
 	protected PredictionHandler predictionProvider;
-	//Contains all the info and logic to handle the rules
-	protected RuleManager ruleProvider;
+
 	//Contains all the info and logic to handle the rules
 	protected BehaviourManager behaviourProvider;
 	
@@ -160,7 +159,6 @@ public class PredictionModule implements IFloodlightModule, INetTopologyService,
 		createTopologyThread.start();
 		mongodb.connect();
 		predictionProvider = new PredictionHandler(mongodb);
-		ruleProvider = new RuleManager(mongodb);
 		behaviourProvider = new BehaviourManager(mongodb);
 	}
 	@Override

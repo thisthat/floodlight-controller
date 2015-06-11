@@ -18,7 +18,7 @@ public class BehaviourManager {
 
         /**
          * Create the thread
-         * @param behaviourManager : The RuleManager object
+         * @param behaviourManager : The Behaviour Manager object
          */
         public GetBehaviourAsync(BehaviourManager behaviourManager) {
             this.bm =  behaviourManager;
@@ -39,6 +39,7 @@ public class BehaviourManager {
 
     }
 
+    //List of behaviours
     protected List<Behaviour> behaviours = new ArrayList<>();
     protected MongoDBInfo mongodb;
     protected Thread getRulesThread;
