@@ -22,7 +22,7 @@ public class BindUrlWebRoutable implements RestletRoutable {
         router.attach("/info/mongoDB", MongoDBResource.class);
         router.attach("/prediction/{" + DPID + "}/dataset", DatasetNodeInfoResource.class);
         router.attach("/prediction/{" + DPID + "}/{" + TYPE + "}/execute", ExecutePrediction.class);
-        router.attach("/behaviour/time", ExecutePrediction.class);
+        router.attach("/behaviour/time", BehaviourManagerResource.class);
         return router;
     }
  
