@@ -9,16 +9,13 @@ import weka.core.converters.ConverterUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Handle the Prediction feature for all the switches
  */
 public class PredictionHandler {
-	private String _folder = "prediction/";
+	private static final String _folder = "prediction/";
 	protected Map<String, PredictionNode> prediction = new HashMap<String, PredictionNode>();
 	protected MongoDBInfo mongodb;
 
@@ -27,39 +24,56 @@ public class PredictionHandler {
 	 */
 	public class PredictionNode {
 		private AbstractClassifier classifier;
-		private boolean isLearning = false;
-		private String modelPath = "";
-		private static final String defaultUri = "prediction/default.model";
+		private List<String> modelPath = new ArrayList<>();
+		private int _indexModel = 0;
+		private static final String defaultUri = _folder + "default.model";
 		private java.util.Date lastLoad = new java.util.Date(0);
 		private DataSetInfo ds = new DataSetInfo();
 		private MongoDBInfo mongodb;
 		private String dpid;
 
-		public PredictionNode(MongoDBInfo db, String id){ this.mongodb = db; this.dpid = id; }
-
 		/**
 		 * Create the classifier from file and setting the learning as False
-		 * @param uri: file path of the model
+		 * @param db: MongoDB instance
+		 * @param id: DPID of the node
 		 */
-		public PredictionNode(MongoDBInfo db, String id, String uri){
+		public PredictionNode(MongoDBInfo db, String id){
 			this.mongodb = db;
 			this.dpid = id;
-			modelPath = uri;
-			loadClassifierFromFile(uri);
+			this.modelPath.add(defaultUri);
+			//Check the folder
+			File f = new File(_folder + id);
+			//Check if we have the forlder, if not create it and load default model
+			if(f.exists()){
+				//Check all file inside the switch folder for classifier models
+				File[] listOfFiles = f.listFiles();
+				for (int i = 0; i < listOfFiles.length; i++) {
+					if (listOfFiles[i].isFile()){ //Must be a file
+						String file = listOfFiles[i].getName();
+						//And it's extension a .model file
+						if(file.substring(file.indexOf('.')).equals(".model")){
+							System.out.println("[FOUND] Model for node <" + this.dpid + "> :: " + file);
+							modelPath.add(_folder + this.dpid + "/" + file);
+						}
+					}
+				}
+				if(modelPath.size() == 1){
+					System.out.println("[LOAD] Default model for node <" + this.dpid + ">");
+					loadClassifierFromFile(defaultUri);
+				}
+				else {
+					_indexModel = 1;
+					System.out.println("[LOAD] First model for node <" + this.dpid + "> :: " + modelPath.get(_indexModel));
+					loadClassifierFromFile(modelPath.get(_indexModel));
+				}
+			}
+			else {
+				f.mkdir();
+				loadClassifierFromFile(defaultUri);
+			}
+
 		}
 
-		/**
-		 * Create the classifier from file
-		 * @param uri: file path of the model
-		 * @param learning: boolean flag to toggle the continous learning
-		 */
-		public PredictionNode(MongoDBInfo db, String id,String uri, boolean learning){
-			this.mongodb = db;
-			this.dpid = id;
-			modelPath = uri;
-			loadClassifierFromFile(uri);
-			isLearning = learning;
-		}
 
 		/**
 		 * Getter
@@ -71,20 +85,41 @@ public class PredictionHandler {
 			}
 			return classifier.getClass().getName();
 		}
-		/**
-		 * Getter
-		 * @return the state of learning
-		 */
-		public boolean getLearning(){
-			return isLearning;
-		}
+
+
 
 		/**
 		 * Getter
-		 * @return the path of the model
+		 * @return Search in the directory and build the list of avaiable elements
+		 */
+		public List<String> getAllModelsPath() {
+			this.modelPath.clear();
+			this.modelPath.add(defaultUri);
+			//Check the folder
+			File f = new File(_folder + this.dpid);
+			//Check if we have the forlder, if not create it and load default model
+			if(f.exists()){
+				//Check all file inside the switch folder for classifier models
+				File[] listOfFiles = f.listFiles();
+				for (int i = 0; i < listOfFiles.length; i++) {
+					if (listOfFiles[i].isFile()){ //Must be a file
+						String file = listOfFiles[i].getName();
+						//And it's extension a .model file
+						if(file.substring(file.indexOf('.')).equals(".model")){
+							System.out.println("[FOUND] Model for node <" + this.dpid + "> :: " + file);
+							modelPath.add(file);
+						}
+					}
+				}
+			}
+			return modelPath;
+		}
+		/**
+		 * Getter
+		 * @return the current used model
 		 */
 		public String getModelPath() {
-			return modelPath;
+			return modelPath.get(_indexModel);
 		}
 
 		/**
@@ -148,7 +183,7 @@ public class PredictionHandler {
 			}
 		}
 		public void loadClassifierFromFile(){
-			loadClassifierFromFile(this.modelPath);
+			loadClassifierFromFile(this.modelPath.get(_indexModel));
 		}
 
 		/**
@@ -229,9 +264,7 @@ public class PredictionHandler {
 		for(SwitchNode s : switches){
 			String name = s.getName();
 			if(!prediction.containsKey(name)){
-				//Standard is {dpid}.model
-				String fileModel = _folder + name + ".model";
-				PredictionNode p = new PredictionNode(this.mongodb, name, fileModel);
+				PredictionNode p = new PredictionNode(this.mongodb, name);
 				prediction.put(name, p);
 			}
 		}

@@ -6,6 +6,7 @@ import org.restlet.resource.ServerResource;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 
 public class ClassifierInfoResource extends ServerResource {
@@ -66,9 +67,17 @@ public class ClassifierInfoResource extends ServerResource {
         String out = "{";
         out += "\"dpid\" : \"" + dpid + "\",";
         out += "\"classifier\" : \"" + node.getClassifierName() + "\",";
-        out += "\"isLearning\" : \"" + node.getLearning() + "\",";
         out += "\"modelPath\" : \"" + node.getModelPath() + "\",";
-        out += "\"loadedAt\" : \"" + node.getLoadedTimeStr() + "\"";
+        out += "\"loadedAt\" : \"" + node.getLoadedTimeStr() + "\",";
+        out += "\"avaiableClassifiers\" : [\n";
+        List<String> models = node.getAllModelsPath();
+        for(int i = 0; i < models.size(); i++){
+            out += "{\"" + i + "\" : \"" + models.get(i) + "\"}";
+            if(i != models.size()-1){
+                out += ",\n";
+            }
+        }
+        out += "]\n";
         out += "}\n";
         return out;
     }
