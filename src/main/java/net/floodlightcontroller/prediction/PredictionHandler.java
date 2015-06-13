@@ -107,13 +107,39 @@ public class PredictionHandler {
 						//And it's extension a .model file
 						if(file.substring(file.indexOf('.')).equals(".model")){
 							System.out.println("[FOUND] Model for node <" + this.dpid + "> :: " + file);
-							modelPath.add(file);
+							modelPath.add(_folder + this.dpid + "/" + file);
 						}
 					}
 				}
 			}
 			return modelPath;
 		}
+
+		/**
+		 *
+		 * @return the number of avaiable classifier
+		 */
+		public int getNumberOfAvaiableModels(){
+			return this.modelPath.size();
+		}
+
+		/**
+		 * Set the model
+		 * @param index: number of model to use
+		 */
+		public void setModel(int index){
+			this._indexModel = index;
+			loadClassifierFromFile();
+		}
+
+		/**
+		 *
+		 * @return get the current model index
+		 */
+		public int getIndexModel(){
+			return _indexModel;
+		}
+
 		/**
 		 * Getter
 		 * @return the current used model

@@ -1,7 +1,9 @@
 package net.floodlightcontroller.prediction;
 
 
+import org.json.JSONObject;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import java.io.FileNotFoundException;
@@ -29,5 +31,26 @@ public class ClassifierReloadResource extends ServerResource {
         return "{ \"msg\" : \"DPID not in memory!\"}\n";
     }
 
+    @Post
+    public String store(String in) {
+        INetTopologyService service = (INetTopologyService)getContext().getAttributes().get(INetTopologyService.class.getCanonicalName());
+        ph = service.getPredictionStructure();
+        String dpid = (String) getRequestAttributes().get(BindUrlWebRoutable.DPID);
+        try {
+            JSONObject jp = new JSONObject(in);
+            int index = Integer.parseInt(jp.getString("index"));
+            PredictionHandler.PredictionNode node = ph.getSwitch(dpid);
+            if(index >= node.getNumberOfAvaiableModels()){
+                return "{ \"status\" : \"err\" }\n";
+            }
+            node.setModel(index);
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            return "{ \"status\" : \"err\" }\n";
+        }
+        return "{ \"status\" : \"ok\" }\n";
+
+    }
 
 }
