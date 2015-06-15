@@ -14,6 +14,9 @@ import org.restlet.resource.ServerResource;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class DatasetNodeInfoResource extends ServerResource {
@@ -22,11 +25,19 @@ public class DatasetNodeInfoResource extends ServerResource {
         INetTopologyService service = (INetTopologyService)getContext().getAttributes().get(INetTopologyService.class.getCanonicalName());
         String dpid = (String) getRequestAttributes().get(BindUrlWebRoutable.DPID);
         String out = "[\n";
+        List<String> keys = new ArrayList<>();
         if(dpid.equals("all")){
             Map<String, PredictionHandler.PredictionNode> m = service.getPredictionStructure().getSwitches();
             for(Map.Entry<String, PredictionHandler.PredictionNode> entry : m.entrySet()) {
-                DataSetInfo ds = entry.getValue().getDatasetInfo();
+                //DataSetInfo ds = entry.getValue().getDatasetInfo();
                 String _dpid = entry.getKey();
+                keys.add(_dpid);
+                //out += convert2json(_dpid,ds) + ",";
+            }
+            Collections.sort(keys);
+            for(int i = 0; i < keys.size(); i++){
+                String _dpid = keys.get(i);
+                DataSetInfo ds = m.get(_dpid).getDatasetInfo();
                 out += convert2json(_dpid,ds) + ",";
             }
             out = removeLastComma(out);
