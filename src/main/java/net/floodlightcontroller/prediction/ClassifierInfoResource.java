@@ -6,6 +6,8 @@ import org.restlet.resource.ServerResource;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +36,14 @@ public class ClassifierInfoResource extends ServerResource {
     private String getAllInfo() {
         String out = "[";
         Map<String, PredictionHandler.PredictionNode> m = ph.getSwitches();
+        List<String> keys = new ArrayList<>();
         for(Map.Entry<String, PredictionHandler.PredictionNode> entry : m.entrySet()) {
             String key = entry.getKey();
+            keys.add(key);
+        }
+        Collections.sort(keys);
+        for(int i = 0; i < keys.size(); i++){
+            String key = keys.get(i);
             out += getSwitchInfo(key) + ",";
         }
         out = removeLastComma(out);

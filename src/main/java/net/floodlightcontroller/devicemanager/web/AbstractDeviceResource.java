@@ -141,6 +141,15 @@ public abstract class AbstractDeviceResource extends ServerResource {
         return new FilterIterator<Device>(diter) {
             @Override
             protected boolean matches(Device value) {
+                //Get only the one with an IP
+                if(value.getIPv4Addresses().length == 0){
+                    return false;
+                }
+                //And if one IP, must be different from 0.0.0.0
+                if(value.getIPv4Addresses().length == 1 && value.getIPv4Addresses()[0].toString().equals("0.0.0.0")){
+                    return false;
+                }
+
                 if (macStartsWith != null) {
                     if (!value.getMACAddressString().startsWith(macStartsWith))
                         return false;
