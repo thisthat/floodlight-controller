@@ -25,6 +25,7 @@ public class PredictionHandler {
 	public class PredictionNode {
 		private AbstractClassifier classifier;
 		private List<String> modelPath = new ArrayList<>();
+		private List<AbstractClassifier> classifiersList = new ArrayList<>();
 		private int _indexModel = 0;
 		private static final String defaultUri = _folder + "default.model";
 		private java.util.Date lastLoad = new java.util.Date(0);
@@ -33,7 +34,7 @@ public class PredictionHandler {
 		private String dpid;
 
 		/**
-		 * Create the classifier from file and setting the learning as False
+		 * Create the classifier from file and generate the list of classifiers
 		 * @param db: MongoDB instance
 		 * @param id: DPID of the node
 		 */
@@ -53,13 +54,22 @@ public class PredictionHandler {
 						//And it's extension a .model file
 						if(file.substring(file.indexOf('.')).equals(".model")){
 							System.out.println("[FOUND] Model for node <" + this.dpid + "> :: " + file);
-							modelPath.add(_folder + this.dpid + "/" + file);
+							String tmp = _folder + this.dpid + "/" + file;
+							modelPath.add(tmp);
+							try {
+								AbstractClassifier tmpClassfier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(tmp));
+								classifiersList.add(tmpClassfier);
+							} catch(Exception e) {}
 						}
 					}
 				}
 				if(modelPath.size() == 1){
 					System.out.println("[LOAD] Default model for node <" + this.dpid + ">");
 					loadClassifierFromFile(defaultUri);
+					try{
+						AbstractClassifier tmpClassfier = (AbstractClassifier) SerializationHelper.read(new FileInputStream(defaultUri));
+						classifiersList.add(tmpClassfier);
+					} catch(Exception e) {}
 				}
 				else {
 					_indexModel = 1;
@@ -154,7 +164,7 @@ public class PredictionHandler {
 		 */
 		public String getLoadedTimeStr(){
 			String t = lastLoad.getTime() + "";
-			return t.substring(0, t.length()-3);
+			return t.substring(0, t.length() - 3);
 		}
 
 		/**
@@ -274,6 +284,59 @@ public class PredictionHandler {
 			return executePredictionClassIndex(path);
 		}
 
+		/**
+		 * Return the index class list of all classifiers
+		 * @return List of predicted class
+		 * @throws Exception: if something goes wrong
+		 */
+		public List<String> executePredictionListIndex() throws Exception {
+			List<String> indexes = new ArrayList<>();
+			//Get the data
+			String[] data = mongodb.getSwitchLastMeasurement(this.dpid, ds.getLags());
+			String path = ds.generateARFFFromData(data);
+			ConverterUtils.DataSource ds = new ConverterUtils.DataSource(path);
+			Instances dataset = ds.getDataSet();
+			dataset.setClassIndex(dataset.numAttributes() - 1);
+			//There must exists only one instance
+			if(dataset.numInstances() != 1){
+				throw new NotCorrespondingInstanceNumberException();
+			}
+			//Classify the data
+			for(int i = 0; i < classifiersList.size(); i++){
+				AbstractClassifier c = classifiersList.get(i);
+				double classPred = 0;
+				classPred = c.classifyInstance(dataset.instance(0));
+				indexes.add( (int)classPred + "");
+			}
+			return indexes;
+		}
+
+		/**
+		 * Return the class name list of all classifiers
+		 * @return List of names of predicted class
+		 * @throws Exception: if something goes wrong
+		 */
+		public List<String> executePredictionListClassName() throws Exception {
+			List<String> names = new ArrayList<>();
+			//Get the data
+			String[] data = mongodb.getSwitchLastMeasurement(this.dpid, ds.getLags());
+			String path = ds.generateARFFFromData(data);
+			ConverterUtils.DataSource ds = new ConverterUtils.DataSource(path);
+			Instances dataset = ds.getDataSet();
+			dataset.setClassIndex(dataset.numAttributes() - 1);
+			//There must exists only one instance
+			if(dataset.numInstances() != 1){
+				throw new NotCorrespondingInstanceNumberException();
+			}
+			//Classify the data
+			for(int i = 0; i < classifiersList.size(); i++){
+				AbstractClassifier c = classifiersList.get(i);
+				double classPred = 0;
+				classPred = c.classifyInstance(dataset.instance(0));
+				names.add(dataset.classAttribute().value((int) classPred));
+			}
+			return names;
+		}
 
 
 	}

@@ -22,6 +22,7 @@ public class BindUrlWebRoutable implements RestletRoutable {
         router.attach("/prediction/{" + PRED_STATS + "}/json", ClassifierInfoResource.class);
         router.attach("/prediction/{" + DPID + "}/reload", ClassifierReloadResource.class);
         router.attach("/prediction/{" + DPID + "}/{" + TYPE + "}/execute", ExecutePrediction.class);
+        router.attach("/prediction/{" + DPID + "}/{" + TYPE + "}/execute/all", ExecutePredictionAll.class);
         router.attach("/behaviour/time", BehaviourManagerResource.class);
         return router;
     }

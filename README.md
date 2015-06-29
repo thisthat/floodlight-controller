@@ -14,6 +14,7 @@
 | /wm/controller/info/mongoDB           | GET/POST     | json | Get/Set IP and PORT of mongoDB connection |
 | /wm/controller/prediction/{dpid}/dataset | GET/POST  | json | dpid: *all* or *dpid* of a switch. Get/Set features for the dataset |
 | /wm/controller/prediction/{dpid}/{type}/execute | GET       | json | dpid: *all* or *dpid* of a switch. type: *class* or *index* to get the class name or the index. Get the prediction of the load af a node |
+| /wm/controller/prediction/{dpid}/{type}/execute/all | GET       | json | dpid: *all* or *dpid* of a switch. type: *class* or *index* to get list of class names or indexs from all classifiers attached to that node. |
 | /wm/controller/behaviour/time         | GET/POST      | json | Change the timeout of the apply of the behaviours. Pass the ms w/ the POST request |
 For more information about the original project, please visit: http://github.com/floodlight/
 
