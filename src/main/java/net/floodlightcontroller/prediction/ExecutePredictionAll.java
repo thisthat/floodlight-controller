@@ -21,47 +21,46 @@ public class ExecutePredictionAll extends ServerResource {
             //Foreach switch
             for(Map.Entry<String, PredictionHandler.PredictionNode> entry : m.entrySet()) {
                 String _dpid = entry.getKey();
-                try {
-                    List<String> _Predicted;
-                    if(type.equals("class")){
-                        _Predicted = prediction.getSwitch(_dpid).executePredictionListClassName();
-                    }
-                    else {
-                        _Predicted = prediction.getSwitch(_dpid).executePredictionListIndex();
-                    }
-                    out += "{ \"DPID\" : \"" + _dpid + "\", " + serializeList2Json(_Predicted) + "},\n";
-                } catch (Exception e) {
-                    return "{ \"status\" : \"err\", \"message\" : \"" + e.getMessage() + "::" +  e.getClass() + "\" }";
-                }
+                out += generateSingleNode(_dpid, type, prediction) + ",";
             }
             out = removeLastComma(out);
         }
         //Signle switch
         else {
-            try {
-                List<String> _Predicted;
-                if(type.equals("class")){
-                    _Predicted = prediction.getSwitch(dpid).executePredictionListClassName();
-                }
-                else {
-                    _Predicted = prediction.getSwitch(dpid).executePredictionListIndex();
-                }
-                return "{ \"DPID\" : \"" + dpid + "\", " + serializeList2Json(_Predicted) + "}\n";
-            } catch (Exception e) {
-                return "{ \"status\" : \"err\", \"message\" : \"" + e.getMessage() + "\" }";
-            }
+            out += generateSingleNode(dpid, type, prediction);
         }
-
         out += "]\n";
         return out;
     }
 
-    private String serializeList2Json(List<String> l){
+    private String generateSingleNode(String _dpid, String type,PredictionHandler prediction){
         String out = "";
+        try {
+            List<String> _Predicted;
+            PredictionHandler.PredictionNode sw = prediction.getSwitch(_dpid);
+            if(type.equals("class")){
+                _Predicted = sw.executePredictionListClassName();
+            }
+            else {
+                _Predicted = sw.executePredictionListIndex();
+            }
+            out += "{ \"DPID\" : \"" + _dpid
+                    + "\", \"ClassSize\" : \"" + sw.getDatasetInfo().getClassSize()
+                    + "\", \"ValueList\" : " + serializeList2Json(sw.getLastData())
+                    + ", \"PredictionList\" : " + serializeList2Json(_Predicted) + "}";
+        } catch (Exception e) {
+            return "{ \"status\" : \"err\", \"message\" : \"" + e.getMessage() + "::" +  e.getClass() + "\" }";
+        }
+        return out;
+    }
+
+    private String serializeList2Json(List<String> l){
+        String out = "[";
         for(int i = 0; i < l.size(); i++){
-            out += "\"" + i + "\" : \"" + l.get(i) + "\",";
+            out += "\"" + l.get(i) + "\",";
         }
         out = removeLastComma(out);
+        out += "]";
         return out;
     }
 

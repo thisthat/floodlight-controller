@@ -338,6 +338,14 @@ public class PredictionHandler {
 			return names;
 		}
 
+		/**
+		 * Get the last data used to classify the next load
+		 * @return List of data
+		 */
+		public List<String> getLastData() {
+			String[] data = mongodb.getSwitchLastMeasurement(this.dpid, ds.getLags());
+			return Arrays.asList(data);
+		}
 
 	}
 
